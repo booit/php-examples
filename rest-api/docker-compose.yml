@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  web:
+    build:
+      context: .
+      dockerfile: infra/web/web.Dockerfile
+    depends_on:
+      - db
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./web/:/var/www/html/
+      # httpd.conf 수정할 필요 있을 때 설정
+      # - ./infra/web/httpd.conf:/usr/local/apache2/conf/httpd.conf
+  db:
+    # mysql image의 m1 chip 지원문제 때문에 platform 옵션 추가
+    # - https://stackoverflow.com/questions/65456814/docker-apple-silicon-m1-preview-mysql-no-matching-manifest-for-linux-arm64-v8
+    platform: linux/x86_64
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: admin1234
+      MYSQL_DATABASE: rest-api-db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: user1234
+    volumes:
+      # 초기 DB 데이터 구성
+      - "./infra/db/initdb.d/:/docker-entrypoint-initdb.d/"
+    ports:
+      - "9906:3306"
