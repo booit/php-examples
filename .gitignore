@@ -1,0 +1,5 @@
+# composer deps
+vendor
+
+# npm deps
+node_modules
